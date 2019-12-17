@@ -57,7 +57,7 @@
   </div>
 
   <button
-    [disabled]="form.invalid"
+    [disabled]="form.invalid || submitted"
     type="submit"
     class="btn btn-primary"
   >Login</button>

@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { AuthService } from '../shared/services/auth.service';
 
 @Component({
   selector: 'app-dashboard-page',
@@ -11,5 +12,4 @@ export class DashboardPageComponent implements OnInit {
 
   ngOnInit() {
   }
-
 }
