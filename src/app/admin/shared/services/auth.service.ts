@@ -1,14 +1,15 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs/index';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Observable, Subject, throwError } from 'rxjs';
+import { catchError, tap } from 'rxjs/operators';
 
 import { FirebaseAuthResponse, User } from '../../../shared/interfaces';
 import { environment } from '../../../../environments/environment';
-import { tap } from 'rxjs/operators';
 
 @Injectable()
 export class AuthService {
 
+  public error$: Subject<string> = new Subject<string>();
   url = `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${
       environment.apiKey
     }
@@ -29,8 +30,10 @@ export class AuthService {
 
   login(user: User): Observable<any> {
     user.returnSecureToken = true;
+    // noinspection JSDeprecatedSymbols
     return this.http.post(this.url, user).pipe(
-      tap(this.setToken)
+      tap(this.setToken),
+      catchError(this.handleError.bind(this))
     )
   }
 
@@ -52,5 +55,21 @@ export class AuthService {
     } else {
       localStorage.clear();
     }
+  }
+
+  private handleError(error: HttpErrorResponse) {
+    const {message} = error.error.error;
+    switch (message) {
+      case 'INVALID_EMAIL':
+        this.error$.next('Invalid email');
+        break;
+      case 'INVALID_PASSWORD':
+        this.error$.next('Invalid password');
+        break;
+      case 'EMAIL_NOT_FOUND':
+        this.error$.next('Email not found');
+        break;
+    }
+    return throwError(error);
   }
 }
