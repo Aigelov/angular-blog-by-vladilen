@@ -32,7 +32,7 @@ export class AuthService {
     user.returnSecureToken = true;
     // noinspection JSDeprecatedSymbols
     return this.http.post(this.url, user).pipe(
-      tap(this.setToken),
+      tap(this.setToken, null, null),
       catchError(this.handleError.bind(this))
     )
   }
